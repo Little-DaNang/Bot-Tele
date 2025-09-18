@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  little-danang-saigon-bot:
+    image: little-danang-saigon-bot
+    platform: linux/amd64
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+

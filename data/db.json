@@ -1,0 +1,12 @@
+{
+  "groups": [
+    {
+      "chatId": -4892426796,
+      "enable": true,
+      "admins": [
+        "domain"
+      ],
+      "rules": []
+    }
+  ]
+}
