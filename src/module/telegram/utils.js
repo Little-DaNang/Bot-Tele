@@ -23,7 +23,7 @@ function getMessageId(ctx) {
  * Get username from Telegraf ctx
  */
 function getUsername(ctx) {
-  return ctx?.from?.username || null;
+  return (ctx?.from?.username + '').toLowerCase() || null;
 }
 
 module.exports = {

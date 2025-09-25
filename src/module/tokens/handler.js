@@ -11,7 +11,7 @@ const handleGiftToken = async (ctx) => {
         return ctx.reply('Invalid format. Use: /gift @username number');
     }
 
-    const targetUsername = messageParts[1].replace('@', '');
+    const targetUsername = messageParts[1].replace('@', '').toLowerCase();
     const amount = parseInt(messageParts[2], 10);
 
     if (isNaN(amount) || amount <= 0) {
@@ -32,6 +32,9 @@ const handleGiftToken = async (ctx) => {
     if (senderBalance < amount) {
         return ctx.reply(`Mới có ${senderBalance} mà đòi gift ${amount}.`);
     }
+    if( amount <= 0){
+        return ctx.reply('Amount must be a positive number. (>0)');
+    }
 
     // Update balances
     db.addPoint(chatId, senderUsername, senderBalance - amount);
@@ -50,7 +53,7 @@ const handleAddToken = (ctx) => {
         return ctx.reply('Invalid format. Use: /gift @username number');
     }
 
-    const targetUsername = messageParts[1].replace('@', '');
+    const targetUsername = messageParts[1].replace('@', '').toLowerCase();
     const amount = parseInt(messageParts[2], 10);
 
     if (isNaN(amount) || amount <= 0) {

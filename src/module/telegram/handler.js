@@ -139,7 +139,10 @@ const handleShowPoints = (ctx) => {
 		points.forEach((member) => {
 			let memberName = Object.keys(member)[0];
 			let memberPoints = member[memberName];
-			pointsText += `@${memberName}: ${memberPoints}\n`;
+            if(username === memberName){
+                memberName = '@' + memberName + ' (You)';
+            }
+            pointsText += `${memberName}: ${memberPoints}\n`;
 		});
 		ctx.reply(pointsText);
 	 }
