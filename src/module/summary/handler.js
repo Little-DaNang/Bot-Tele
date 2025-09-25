@@ -18,13 +18,13 @@ const handleCommandSummary = async (ctx) => {
 			inline_keyboard: [
 				[
 					{ text: '1 giờ', callback_data: 'summary_time_1h' },
-					{ text: '6 giờ', callback_data: 'summary_time_6h' },
-					{ text: '12 giờ', callback_data: 'summary_time_12h' }
+					{ text: '2 giờ', callback_data: 'summary_time_2h' },
+					{ text: '3 giờ', callback_data: 'summary_time_3h' }
 				],
 				[
+					{ text: '6 giờ', callback_data: 'summary_time_6h' },
 					{ text: '1 ngày', callback_data: 'summary_time_1d' },
-					{ text: '3 ngày', callback_data: 'summary_time_3d' },
-					{ text: '1 tuần', callback_data: 'summary_time_1w' }
+					{ text: 'Cancel', callback_data: 'summary_time_cancel' }
 				]
 			]
 		}
@@ -41,11 +41,15 @@ const handleSummaryPickTime = async (ctx) => {
 	let toTime = now;
 
 	// remove message keyboard ctx.update.callback_query.message.message_id
-	if (ctx.update.callback_query.message) {
-		await ctx.telegram.deleteMessage(
-			chatId,
-			ctx.update.callback_query.message.message_id
-		);
+	try{
+		if (ctx.update.callback_query.message) {
+			await ctx.telegram.deleteMessage(
+				chatId,
+				ctx.update.callback_query.message.message_id
+			);
+		}
+	}catch (e) {
+
 	}
 
 	// Remove previous inline keyboard (button)
@@ -62,20 +66,20 @@ const handleSummaryPickTime = async (ctx) => {
 		case 'summary_time_1h':
 			fromTime = now - 60 * 60 * 1000;
 			break;
-		case 'summary_time_6h':
-			fromTime = now - 6 * 60 * 60 * 1000;
+		case 'summary_time_2h':
+			fromTime = now - 2 * 60 * 60 * 1000;
 			break;
-		case 'summary_time_12h':
-			fromTime = now - 12 * 60 * 60 * 1000;
+		case 'summary_time_3h':
+			fromTime = now - 3 * 60 * 60 * 1000;
 			break;
 		case 'summary_time_1d':
 			fromTime = now - 24 * 60 * 60 * 1000;
 			break;
-		case 'summary_time_3d':
-			fromTime = now - 3 * 24 * 60 * 60 * 1000;
+		case 'summary_time_6h':
+			fromTime = now - 6 * 60 * 60 * 1000;
 			break;
-		case 'summary_time_1w':
-			fromTime = now - 7 * 24 * 60 * 60 * 1000;
+		case 'summary_time_cancel':
+			return;
 			break;
 		default:
 			await ctx.reply('Khoảng thời gian không hợp lệ.');

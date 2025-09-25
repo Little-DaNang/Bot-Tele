@@ -5,6 +5,7 @@ handleShowRules, handleAddRule, handleRemoveRule,
 handleShowPoints, handleAddAdmin, handleRemoveAdmin } = require('./handler');
 
 const { handleSummaryCollection, handleCommandSummary, handleSummaryPickTime } = require('./../summary/handler');
+const { handleGiftToken, handleAddToken } = require('./../tokens/handler');
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const { handleAskAI } = require('./../ai/ask');
@@ -32,6 +33,8 @@ bot.command('tokens', (ctx) => { handleShowPoints(ctx); });
 
 // tóm tắt trò chuyện gần đây
 bot.command('summary', (ctx) => { handleCommandSummary(ctx); });
+bot.command('gift', (ctx) => { handleGiftToken(ctx); });
+bot.command('addTokens', (ctx) => { handleAddToken(ctx); });
 
 // handle callback query for summary time selection
 bot.on('callback_query', async (ctx) => {
