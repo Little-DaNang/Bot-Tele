@@ -15,7 +15,7 @@ const handlePoint = async (ctx) => {
 	 db.getRules(utils.getChatId(ctx)).join('\n');
 	let userMessage = ctx.message.text;
    const requestBody = {
-      model: 'gpt-local',
+      model: db.getModel(),
       messages: [
         {
           role: 'system',
