@@ -102,20 +102,20 @@ const handleSummaryPickTime = async (ctx) => {
 		const summary = await summaryChat(logsChat);
 		if (summary) {
 			summaryText += `Nội dung tóm tắt:\n${summary.summary}\n\n`;
-			if (summary.actions && summary.actions.length > 0) {
-				summaryText += `Các việc cần làm:\n`;
-				summary.actions.forEach((action, index) => {
-					summaryText += `${index + 1}. ${action}\n`;
-				});
-				summaryText += `\n`;
-			}
-			if (summary.highlights && summary.highlights.length > 0) {
-				summaryText += `Tin nổi bật:\n`;
-				summary.highlights.forEach((highlight) => {
-					summaryText += `- ${highlight}\n`;
-				});
-				summaryText += `\n`;
-			}
+			// if (summary.actions && summary.actions.length > 0) {
+			// 	summaryText += `Các việc cần làm:\n`;
+			// 	summary.actions.forEach((action, index) => {
+			// 		summaryText += `${index + 1}. ${action}\n`;
+			// 	});
+			// 	summaryText += `\n`;
+			// }
+			// if (summary.highlights && summary.highlights.length > 0) {
+			// 	summaryText += `Tin nổi bật:\n`;
+			// 	summary.highlights.forEach((highlight) => {
+			// 		summaryText += `- ${highlight}\n`;
+			// 	});
+			// 	summaryText += `\n`;
+			// }
 		} else {
 			summaryText += 'Không thể tạo tóm tắt vào lúc này. Vui lòng thử lại sau.';
 		}
@@ -146,7 +146,9 @@ const summaryChat = async (logsChat) => {
 		messages: [
 			{
 				"role": "system",
-				"content": "Bạn là một trợ lý AI chuyên tóm tắt hội thoại nhóm.\nNhiệm vụ của bạn:\n- Đọc toàn bộ log hội thoại trong khoảng thời gian được cung cấp.\n- Tóm tắt ngắn gọn nội dung chính, ghi ngắn gọn, đủ ý, đọc nhanh, không dài dòng, tập trung vào thông tin quan trọng (ví dụ: xin nghỉ, xin trễ, thông báo quan trọng, câu hỏi cần xử lý...).\n- Nếu có thông tin cần hành động (ví dụ: cần submit form, mua hàng, đăng ký nghỉ phép...), hãy trích xuất thành danh sách.\n- Nếu có những câu nói quan trọng cần chú ý, hãy đưa vào highlights. Mỗi highlight là một chuỗi trên 1 dòng, định dạng:\n  \"[time] name: content\"\n- Trả về kết quả đúng định dạng JSON sau:\n\n{\n  \"summary\": \"Nội dung tóm tắt ngắn gọn ở đây\",\n  \"actions\": [\"Danh sách các việc cần làm nếu có\"],\n  \"highlights\": [\n    \"[time] thời gian tính theo GMT+7 (giờ việt nam) name: nội dung, chỉ đưa vào những nội dung quan trong và cần chú ý\",\n    \"[time] name: nội dung quan trọng\"\n  ]\n}\n\nKhông thêm bất kỳ nội dung nào ngoài JSON."
+				// "content": "Bạn là một trợ lý AI chuyên tóm tắt hội thoại nhóm.\nNhiệm vụ của bạn:\n- Đọc toàn bộ log hội thoại trong khoảng thời gian được cung cấp.\n- Tóm tắt ngắn gọn nội dung chính, ghi ngắn gọn, đủ ý, đọc nhanh, không dài dòng, tập trung vào thông tin quan trọng (ví dụ: xin nghỉ, xin trễ, thông báo quan trọng, câu hỏi cần xử lý...).\n- Nếu có thông tin cần hành động (ví dụ: cần submit form, mua hàng, đăng ký nghỉ phép...), hãy trích xuất thành danh sách.\n- Nếu có những câu nói quan trọng cần chú ý, hãy đưa vào highlights. Mỗi highlight là một chuỗi trên 1 dòng, định dạng:\n  \"[time] name: content\"\n- Trả về kết quả đúng định dạng JSON sau:\n\n{\n  \"summary\": \"Nội dung tóm tắt ngắn gọn ở đây\",\n  \"actions\": [\"Danh sách các việc cần làm nếu có\"],\n  \"highlights\": [\n    \"[time] thời gian tính theo GMT+7 (giờ việt nam) name: nội dung, chỉ đưa vào những nội dung quan trong và cần chú ý\",\n    \"[time] name: nội dung quan trọng\"\n  ]\n}\n\nKhông thêm bất kỳ nội dung nào ngoài JSON."
+				// "content": "Bạn là một trợ lý AI chuyên tóm tắt hội thoại nhóm.\nNhiệm vụ của bạn:\n- Đọc toàn bộ log hội thoại trong khoảng thời gian được cung cấp.\n- Tóm tắt ngắn gọn nội dung chính, ghi ngắn gọn, đủ ý, đọc nhanh, không dài dòng, tập trung vào thông tin quan trọng (ví dụ: xin nghỉ, xin trễ, thông báo quan trọng, câu hỏi cần xử lý...). Trả về kết quả đúng định dạng JSON sau:\n\n{\n  \"summary\": \"Nội dung tóm tắt ngắn gọn ở đây\"\n}\n\nKhông thêm bất kỳ nội dung nào ngoài JSON."
+				"content": "Bạn là một trợ lý AI chuyên tóm tắt hội thoại nhóm.\nNhiệm vụ của bạn:\n- Đọc toàn bộ log hội thoại trong khoảng thời gian được cung cấp.\n- Tóm tắt ngắn gọn nội dung chính, ghi ngắn gọn, đủ ý, đọc nhanh, không dài dòng, tập trung vào thông tin quan trọng.\n- Nếu có những câu nói quan trọng cần chú ý, hãy đưa vào highlights. Mỗi highlight là một chuỗi trên 1 dòng, định dạng:\n  \"name: content\"\n- Trả về kết quả đúng định dạng JSON sau:\n\n{\n  \"summary\": \"Nội dung tóm tắt ngắn gọn ở đây\",\n \"highlights\": [\n    \"name: nội dung, chỉ đưa vào những nội dung quan trong và cần chú ý\",\n    \"name: nội dung quan trọng\"\n  ]\n}\n\nKhông thêm bất kỳ nội dung nào ngoài JSON."
 			},
 			{
 				role: 'user',

@@ -172,6 +172,20 @@ function getPoints(chatId) {
   return group.members || [];
 }
 
+function setModel(chatId, model) {
+  const db = readDB();
+  //update value db.model
+  db.model = model;
+  writeDB(db);
+  return true;
+}
+const modelDefault = 'gpt-5.1';
+function getModel() {
+  const db = readDB();
+  // For simplicity, return default model db.model
+  return db.model || modelDefault;
+}
+
 module.exports = {
   addGroup,
   removeGroup,
@@ -191,5 +205,7 @@ module.exports = {
   isEnable,
   getRules,
   getGroup,
-  getPoints
+  getPoints,
+  setModel,
+  getModel
 };
