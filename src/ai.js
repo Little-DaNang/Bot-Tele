@@ -1,5 +1,7 @@
+
 require('dotenv').config();
 const axios = require('axios');
+const db = require('./db/db');
 
 const chatComplete = async (requestBody) => {
 //	console.log('chatComplete:', requestBody);
@@ -22,7 +24,7 @@ const callPointAI = async (userMessage) => {
     const userMessage = ctx.message.text;
     // Prepare the request body as required
     const requestBody = {
-      model: 'gpt-local',
+      model: db.getModel(),
       messages: [
         {
           role: 'system',
@@ -79,7 +81,7 @@ const askAI = async (contentAsk) => {
 	try {
 		// Prepare the request body as required
 		const requestBody = {
-		  model: 'gpt-local',
+		  model: db.getModel(),
 		  messages: [
 		    {"role": "system","content": content_system_role},
 		    {role: 'user',content: contentAsk}
@@ -100,10 +102,12 @@ const askAI = async (contentAsk) => {
 		    }
           }
        } catch (e) {
+          console.log('askAI parse error:', e);
        	   // ignore parse error, fallback to default reply
        	   throw e
        }
     } catch (e) {
+        console.log('askAI error:', e);
         // ignore parse error, fallback to default reply
         return e
     }
