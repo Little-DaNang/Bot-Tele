@@ -2,7 +2,7 @@ const utils = require('../telegram/utils');
 const { writeLog } = require('./writer');
 const {readLogs} = require('./reader');
 const axios = require("axios");
-import db from '../../db/db';
+const db = require('../../db/db');
 const handleSummaryCollection = async (ctx) => {
 	//TODO tóm tắt cuộc trò chuyện gần đây trong nhóm
 	let message = ctx.message.text;
