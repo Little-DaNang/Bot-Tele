@@ -36,6 +36,23 @@ bot.command('summary', (ctx) => { handleCommandSummary(ctx); });
 bot.command('gift', (ctx) => { handleGiftToken(ctx); });
 bot.command('addTokens', (ctx) => { handleAddToken(ctx); });
 
+bot.command('setModel', (ctx) => {
+  const message = ctx.message.text;
+  const parts = message.split(' ');
+  if (parts.length < 2) {
+    ctx.reply('Please provide a model name. For example: /setModel gpt-5.1');
+    return;
+  }
+  const model = parts[1].trim();
+  const chatId = ctx.chat.id;
+  const success = require('../../db/db').setModel(chatId, model);
+  if (success) {
+    ctx.reply(`success! Model: "${model}".`);
+  } else {
+    ctx.reply('Failed! Please try again.');
+  }
+});
+
 // handle callback query for summary time selection
 bot.on('callback_query', async (ctx) => {
   const data = ctx.update.callback_query.data;
@@ -61,5 +78,6 @@ const start = () => {
 }
 
 module.exports = {
-	start
+	start,
+	bot
 }

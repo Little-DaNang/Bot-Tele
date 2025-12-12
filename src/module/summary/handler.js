@@ -2,6 +2,7 @@ const utils = require('../telegram/utils');
 const { writeLog } = require('./writer');
 const {readLogs} = require('./reader');
 const axios = require("axios");
+import db from '../../db/db';
 const handleSummaryCollection = async (ctx) => {
 	//TODO tóm tắt cuộc trò chuyện gần đây trong nhóm
 	let message = ctx.message.text;
@@ -98,36 +99,38 @@ const handleSummaryPickTime = async (ctx) => {
 		logs.forEach(log => {
 			logsChat += `[${new Date(log.time).toLocaleTimeString()}] ${log.username}: ${log.message}\n`;
 		});
+		try{
 
-		const summary = await summaryChat(logsChat);
-		if (summary) {
-			summaryText += `Nội dung tóm tắt:\n${summary.summary}\n\n`;
-			// if (summary.actions && summary.actions.length > 0) {
-			// 	summaryText += `Các việc cần làm:\n`;
-			// 	summary.actions.forEach((action, index) => {
-			// 		summaryText += `${index + 1}. ${action}\n`;
-			// 	});
-			// 	summaryText += `\n`;
-			// }
-			// if (summary.highlights && summary.highlights.length > 0) {
-			// 	summaryText += `Tin nổi bật:\n`;
-			// 	summary.highlights.forEach((highlight) => {
-			// 		summaryText += `- ${highlight}\n`;
-			// 	});
-			// 	summaryText += `\n`;
-			// }
-		} else {
-			summaryText += 'Không thể tạo tóm tắt vào lúc này. Vui lòng thử lại sau.';
+			const summary = await summaryChat(logsChat);
+			if (summary) {
+				summaryText += `Nội dung tóm tắt:\n${summary.summary}\n\n`;
+				// if (summary.actions && summary.actions.length > 0) {
+				// 	summaryText += `Các việc cần làm:\n`;
+				// 	summary.actions.forEach((action, index) => {
+				// 		summaryText += `${index + 1}. ${action}\n`;
+				// 	});
+				// 	summaryText += `\n`;
+				// }
+				if (summary.highlights && summary.highlights.length > 0) {
+					summaryText += `Tin nổi bật:\n`;
+					summary.highlights.forEach((highlight) => {
+						summaryText += `- ${highlight}\n`;
+					});
+					summaryText += `\n`;
+				}
+			} else {
+				summaryText += 'Không thể tạo tóm tắt vào lúc này. Vui lòng thử lại sau.';
+			}
+			// Giới hạn độ dài tóm tắt nếu quá dài (ví dụ: 4000 ký tự)
+			if (summaryText.length > 4000) {
+				summaryText = summaryText.slice(0, 4000) + '\n... (và nhiều hơn nữa)';
+			}
+
+			await ctx.reply(summaryText);
+		} catch (e) {
+				await ctx.reply('Đã xảy ra lỗi khi tạo tóm tắt. Vui lòng thử lại sau.\n' + e.message);	
 		}
-		// Giới hạn độ dài tóm tắt nếu quá dài (ví dụ: 4000 ký tự)
-		if (summaryText.length > 4000) {
-			summaryText = summaryText.slice(0, 4000) + '\n... (và nhiều hơn nữa)';
-		}
-
-		await ctx.reply(summaryText);
-
 	});
-
 };
 
 function formatVNDateTime(ts) {
@@ -142,7 +145,7 @@ function formatVNDateTime(ts) {
 const summaryChat = async (logsChat) => {
 	// Gọi API tóm tắt (OpenAI hoặc logic khác)
 	const requestBody = {
-		model: 'gpt-local',
+		model: db.getModel(),
 		messages: [
 			{
 				"role": "system",
@@ -183,11 +186,52 @@ const summaryChat = async (logsChat) => {
 	} catch (error) {
 		// ignore parse error, fallback to default reply
 		console.error('Error parsing summary response:', error);
+		throw error;
 	}
 	return null;
 }
+const handleAutoSummary = async (chatId, bot) => {
+	const now = Date.now();
+	const fromTime = now - 6 * 60 * 60 * 1000; // last 6 hours
+	const toTime = now;
+
+	const logs = await readLogs(chatId, fromTime, toTime);
+	if (!logs || logs.length === 0) {
+		// No logs, skip
+		return;
+	}
+
+	let logsChat = '';
+	logs.forEach(log => {
+		logsChat += `[${new Date(log.time).toLocaleTimeString()}] ${log.username}: ${log.message}\n`;
+	});
+
+	try {
+		const summary = await summaryChat(logsChat);
+		let summaryText = `Tóm tắt tin nhắn từ ${formatVNDateTime(fromTime)} đến ${formatVNDateTime(toTime)}:\n\n`;
+		if (summary) {
+			summaryText += `Nội dung tóm tắt:\n${summary.summary}\n\n`;
+			if (summary.highlights && summary.highlights.length > 0) {
+					summaryText += `Tin nổi bật:\n`;
+					summary.highlights.forEach((highlight) => {
+						summaryText += `- ${highlight}\n`;
+					});
+					summaryText += `\n`;
+				}
+		} else {
+			summaryText += 'Không thể tạo tóm tắt vào lúc này.';
+		}
+
+		// Send to chat
+		await bot.telegram.sendMessage(chatId, summaryText);
+	} catch (e) {
+		console.error('Error sending auto summary to chat', chatId, e);
+	}
+};
+
 module.exports = {
 	handleSummaryCollection,
 	handleCommandSummary,
-	handleSummaryPickTime
+	handleSummaryPickTime,
+	handleAutoSummary
 }
