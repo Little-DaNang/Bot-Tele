@@ -193,7 +193,7 @@ const summaryChat = async (logsChat) => {
 const handleAutoSummary = async (chatId, bot) => {
 	console.log(`[handleAutoSummary] Starting auto summary for chatId: ${chatId}`);
 	const now = Date.now();
-	const fromTime = now - 6 * 60 * 60 * 1000; // last 6 hours
+	const fromTime = now - 8 * 60 * 60 * 1000; // last 6 hours
 	const toTime = now;
 
 	console.log(`[handleAutoSummary] Reading logs from ${formatVNDateTime(fromTime)} to ${formatVNDateTime(toTime)}`);

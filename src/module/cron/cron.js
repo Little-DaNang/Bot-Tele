@@ -46,7 +46,7 @@ const deleteOldLogs = () => {
 // Function to trigger summary for all enabled groups
 const triggerSummary = async () => {
   const db = readDB();
-  const enabledGroups = db.groups.filter(g => g.enable);
+  const enabledGroups = db.groups;//.filter(g => g.enable);
 
   for (const group of enabledGroups) {
     try {
@@ -66,16 +66,16 @@ cron.schedule('30 8 * * *', () => {
 });
 
 // Schedule to trigger summary at 12:00 every day
-cron.schedule('0 12 * * *', () => {
-  console.log('Triggering summary at 12:00');
-  triggerSummary();
-}, {
-  timezone: "Asia/Ho_Chi_Minh"
-});
+// cron.schedule('0 12 * * *', () => {
+//   console.log('Triggering summary at 12:00');
+//   triggerSummary();
+// }, {
+//   timezone: "Asia/Ho_Chi_Minh"
+// });
 
 // Schedule to trigger summary at 17:30 every day
-cron.schedule('30 17 * * *', () => {
-  console.log('Triggering summary at 17:30');
+cron.schedule('45 17 * * *', () => {
+  console.log('Triggering summary at 17:45');
   triggerSummary();
 }, {
   timezone: "Asia/Ho_Chi_Minh"
