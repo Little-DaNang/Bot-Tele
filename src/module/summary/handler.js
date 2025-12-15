@@ -191,25 +191,31 @@ const summaryChat = async (logsChat) => {
 	return null;
 }
 const handleAutoSummary = async (chatId, bot) => {
+	console.log(`[handleAutoSummary] Starting auto summary for chatId: ${chatId}`);
 	const now = Date.now();
 	const fromTime = now - 6 * 60 * 60 * 1000; // last 6 hours
 	const toTime = now;
 
+	console.log(`[handleAutoSummary] Reading logs from ${formatVNDateTime(fromTime)} to ${formatVNDateTime(toTime)}`);
 	const logs = await readLogs(chatId, fromTime, toTime);
 	if (!logs || logs.length === 0) {
+		console.log(`[handleAutoSummary] No logs found for chatId: ${chatId}, skipping summary`);
 		// No logs, skip
 		return;
 	}
 
+	console.log(`[handleAutoSummary] Found ${logs.length} log entries for chatId: ${chatId}`);
 	let logsChat = '';
 	logs.forEach(log => {
 		logsChat += `[${new Date(log.time).toLocaleTimeString()}] ${log.username}: ${log.message}\n`;
 	});
 
 	try {
+		console.log(`[handleAutoSummary] Generating summary for chatId: ${chatId}`);
 		const summary = await summaryChat(logsChat);
 		let summaryText = `Tóm tắt tin nhắn từ ${formatVNDateTime(fromTime)} đến ${formatVNDateTime(toTime)}:\n\n`;
 		if (summary) {
+			console.log(`[handleAutoSummary] Summary generated successfully for chatId: ${chatId}`);
 			summaryText += `Nội dung tóm tắt:\n${summary.summary}\n\n`;
 			if (summary.highlights && summary.highlights.length > 0) {
 					summaryText += `Tin nổi bật:\n`;
@@ -219,13 +225,16 @@ const handleAutoSummary = async (chatId, bot) => {
 					summaryText += `\n`;
 				}
 		} else {
+			console.log(`[handleAutoSummary] No summary generated for chatId: ${chatId}`);
 			summaryText += 'Không thể tạo tóm tắt vào lúc này.';
 		}
 
 		// Send to chat
+		console.log(`[handleAutoSummary] Sending summary to chatId: ${chatId}`);
 		await bot.telegram.sendMessage(chatId, summaryText);
+		console.log(`[handleAutoSummary] Auto summary sent successfully to chatId: ${chatId}`);
 	} catch (e) {
-		console.error('Error sending auto summary to chat', chatId, e);
+		console.error('[handleAutoSummary] Error sending auto summary to chat', chatId, e);
 	}
 };
 
